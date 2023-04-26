@@ -2,6 +2,7 @@
 #import "RNReactNativeGetMusicFiles.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import <React/RCTConvert.h>
+#import <AVFoundation/AVFoundation.h>
 
 @implementation RNReactNativeGetMusicFiles
 
