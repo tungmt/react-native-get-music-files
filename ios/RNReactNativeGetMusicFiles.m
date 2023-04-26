@@ -10,6 +10,44 @@
     return dispatch_get_main_queue();
 }
 RCT_EXPORT_MODULE()
+    
+RCT_EXPORT_METHOD(exportMusic:(NSString *)inputFilePath
+                  outputFilePath:(NSString *)outputFilePath
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  NSURL *inputURL = [NSURL fileURLWithPath:inputFilePath];
+  NSURL *outputURL = [NSURL fileURLWithPath:outputFilePath];
+
+  AVAsset *asset = [AVAsset assetWithURL:inputURL];
+  AVAssetExportSession *exportSession = [AVAssetExportSession exportSessionWithAsset:asset presetName:AVAssetExportPresetAppleM4A];
+
+  if (exportSession == nil) {
+    reject(@"AVAssetExportSession is nil", @"Failed to create AVAssetExportSession", nil);
+    return;
+  }
+
+  exportSession.outputURL = outputURL;
+  exportSession.outputFileType = AVFileTypeMPEG4;
+  exportSession.shouldOptimizeForNetworkUse = YES;
+
+  [exportSession exportAsynchronouslyWithCompletionHandler:^{
+    switch (exportSession.status) {
+      case AVAssetExportSessionStatusCompleted:
+        resolve(outputFilePath);
+        break;
+      case AVAssetExportSessionStatusFailed:
+        reject(@"AVAssetExportSession failed", exportSession.error.localizedDescription, exportSession.error);
+        break;
+      case AVAssetExportSessionStatusCancelled:
+        reject(@"AVAssetExportSession cancelled", @"AVAssetExportSession was cancelled", nil);
+        break;
+      default:
+        reject(@"AVAssetExportSession unknown status", @"AVAssetExportSession completed with unknown status", nil);
+        break;
+    }
+  }];
+}
 
 RCT_EXPORT_METHOD(getAll:(NSDictionary *)params successCallback:(RCTResponseSenderBlock)successCallback) {
     
