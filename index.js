@@ -219,12 +219,15 @@ export const RNAndroidAudioStore = {
 };
 
 const MusicFiles = {
-  exportMusic(inputFilePath, outputFilePath) {
+  exportMusic(inputFilePath) {
+    console.log({inputFilePath})
     return new Promise((resolve, reject) => {
-      RNReactNativeGetMusicFiles.exportMusic(inputFilePath, outputFilePath, (outputPath) => {
-        resolve(outputPath)
-      }, (error) => {
-        reject(error)
+      RNReactNativeGetMusicFiles.exportMusic(inputFilePath, (data, error) => {
+        console.log({data, error})
+        if(error)
+          reject(error)
+        else
+          resolve(data)
       });
     });
   },
